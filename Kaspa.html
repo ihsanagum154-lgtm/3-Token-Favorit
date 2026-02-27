@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoRealTime - KAS, HYPE, ASTER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .token-gradient-kas { background: linear-gradient(135deg, #70e1f5 0%, #ffd194 100%); }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Header -->
+    <header class="p-6 text-center border-b border-white/10 mb-8 bg-slate-900/50">
+        <h1 class="text-3xl font-bold tracking-tight text-cyan-400">
+            <i class="fa-solid fa-chart-line mr-2"></i>CryptoRealTime ID
+        </h1>
+        <p class="text-slate-400 text-sm mt-2">Data Real-Time Koin Pilihan & Konverter Terbilang</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4">
+        
+        <!-- Live Price Cards -->
+        <div id="price-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Kaspa Card -->
+            <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-microchip text-6xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-cyan-300">Kaspa (KAS)</h3>
+                <p class="text-xs text-slate-400 mb-4">Jaringan: KAS Mainnet</p>
+                <div class="text-2xl font-bold" id="price-kas">Memuat...</div>
+                <div class="text-xs mt-2" id="change-kas">--</div>
+            </div>
+
+            <!-- Hyperliquid Card -->
+            <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-droplet text-6xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-purple-400">Hyperliquid (HYPE)</h3>
+                <p class="text-xs text-slate-400 mb-4">Jaringan: Hyperliquid L1</p>
+                <div class="text-2xl font-bold" id="price-hype">Memuat...</div>
+                <div class="text-xs mt-2" id="change-hype">--</div>
+            </div>
+
+            <!-- Aster Card -->
+            <div class="glass-card p-6 rounded-2xl relative overflow-hidden group border-amber-500/30">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-star text-6xl"></i>
+                </div>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-semibold text-amber-400">Aster (ASTER)</h3>
+                    <span class="bg-amber-500/20 text-amber-500 text-[10px] px-1 rounded border border-amber-500/50">Supported by CZ</span>
+                </div>
+                <p class="text-xs text-slate-400 mb-4">Jaringan: BSC / BEP-20</p>
+                <div class="text-2xl font-bold" id="price-aster">Memuat...</div>
+                <div class="text-xs mt-2" id="change-aster">--</div>
+            </div>
+        </div>
+
+        <!-- Calculator & Terbilang Section -->
+        <section class="glass-card p-8 rounded-3xl shadow-2xl">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-calculator text-cyan-400"></i> Konverter Terbilang Otomatis
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Input IDR -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-slate-300">Input Nominal Rupiah (IDR)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">Rp</span>
+                        <input type="number" id="input-idr" placeholder="Contoh: 1500000" 
+                            class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-cyan-500 focus:outline-none text-xl font-semibold">
+                    </div>
+                    <div id="terbilang-idr" class="p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-cyan-300 text-sm italic min-h-[60px]">
+                        Menunggu input...
+                    </div>
+                </div>
+
+                <!-- Crypto Estimate -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-slate-300">Pilih Koin & Satuan Kecil</label>
+                    <select id="select-coin" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 focus:outline-none">
+                        <option value="kas">Kaspa (KAS)</option>
+                        <option value="hype">Hyperliquid (HYPE)</option>
+                        <option value="aster">Aster (ASTER)</option>
+                    </select>
+                    
+                    <div class="p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="text-xs text-slate-400">Hasil Estimasi:</span>
+                            <span id="calc-result" class="text-2xl font-bold text-white">0</span>
+                        </div>
+                        <div id="terbilang-crypto" class="text-xs text-slate-400 italic">
+                            Nol koin
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Network Info Footer -->
+        <footer class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 text-[11px] text-slate-500 uppercase tracking-widest text-center">
+            <div class="p-2 border border-white/5 rounded">Network: Kaspa BlockDAG</div>
+            <div class="p-2 border border-white/5 rounded">Network: Hyperliquid L1</div>
+            <div class="p-2 border border-white/5 rounded">Network: BNB Smart Chain</div>
+        </footer>
+    </main>
+
+    <script>
+        // API Configuration
+        const COINGECKO_API = "https://api.coingecko.com/api/v3/simple/price?ids=kaspa,hyperliquid,aster-2&vs_currencies=idr&include_24hr_change=true";
+        
+        let prices = {
+            kas: 0,
+            hype: 0,
+            aster: 0
+        };
+
+        // Fungsi Ambil Data Real-Time
+        async function fetchPrices() {
+            try {
+                const response = await fetch(COINGECKO_API);
+                const data = await response.json();
+
+                // Update Data Kaspa
+                prices.kas = data.kaspa.idr;
+                updateUI('kas', prices.kas, data.kaspa.idr_24h_change);
+
+                // Update Data Hyperliquid
+                prices.hype = data.hyperliquid.idr;
+                updateUI('hype', prices.hype, data.hyperliquid.idr_24h_change);
+
+                // Update Data Aster
+                prices.aster = data['aster-2'].idr;
+                updateUI('aster', prices.aster, data['aster-2'].idr_24h_change);
+
+                calculateConversion();
+            } catch (error) {
+                console.error("Gagal mengambil harga:", error);
+            }
+        }
+
+        function updateUI(id, price, change) {
+            const priceEl = document.getElementById(`price-${id}`);
+            const changeEl = document.getElementById(`change-${id}`);
+            
+            priceEl.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price);
+            
+            const isPositive = change >= 0;
+            changeEl.innerHTML = `<span class="${isPositive ? 'text-green-400' : 'text-red-400'}">
+                <i class="fa-solid fa-caret-${isPositive ? 'up' : 'down'} mr-1"></i>
+                ${change.toFixed(2)}% (24j)
+            </span>`;
+        }
+
+        // FUNGSI TERBILANG (Logika Bahasa Indonesia)
+        function angkaKeTerbilang(n) {
+            const bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+            let temp = "";
+
+            if (n < 12) {
+                temp = " " + bilangan[Math.floor(n)];
+            } else if (n < 20) {
+                temp = angkaKeTerbilang(n - 10) + " Belas";
+            } else if (n < 100) {
+                temp = angkaKeTerbilang(n / 10) + " Puluh" + angkaKeTerbilang(n % 10);
+            } else if (n < 200) {
+                temp = " Seratus" + angkaKeTerbilang(n - 100);
+            } else if (n < 1000) {
+                temp = angkaKeTerbilang(n / 100) + " Ratus" + angkaKeTerbilang(n % 100);
+            } else if (n < 2000) {
+                temp = " Seribu" + angkaKeTerbilang(n - 1000);
+            } else if (n < 1000000) {
+                temp = angkaKeTerbilang(n / 1000) + " Ribu" + angkaKeTerbilang(n % 1000);
+            } else if (n < 1000000000) {
+                temp = angkaKeTerbilang(n / 1000000) + " Juta" + angkaKeTerbilang(n % 1000000);
+            } else if (n < 1000000000000) {
+                temp = angkaKeTerbilang(n / 1000000000) + " Miliar" + angkaKeTerbilang(n % 1000000000);
+            }
+            return temp;
+        }
+
+        // Fungsi untuk menangani desimal (satuan kecil kripto)
+        function terbilangKripto(n, symbol) {
+            if (n === 0) return "Nol " + symbol;
+            
+            let [bulat, desimal] = n.toString().split('.');
+            let hasil = angkaKeTerbilang(parseInt(bulat)) + " " + symbol;
+            
+            if (desimal) {
+                hasil += " Koma";
+                for (let i = 0; i < desimal.length; i++) {
+                    const d = parseInt(desimal[i]);
+                    hasil += d === 0 ? " Nol" : angkaKeTerbilang(d);
+                    if (i > 4) break; // Batasi desimal terbilang agar tidak terlalu panjang
+                }
+            }
+            return hasil.trim();
+        }
+
+        // Logika Input & Kalkulasi
+        const inputIdr = document.getElementById('input-idr');
+        const displayTerbilangIdr = document.getElementById('terbilang-idr');
+        const selectCoin = document.getElementById('select-coin');
+        const calcResult = document.getElementById('calc-result');
+        const displayTerbilangCrypto = document.getElementById('terbilang-crypto');
+
+        function calculateConversion() {
+            const val = parseFloat(inputIdr.value) || 0;
+            const coin = selectCoin.value;
+            const currentPrice = prices[coin];
+
+            // Update Terbilang IDR
+            if (val > 0) {
+                displayTerbilangIdr.innerText = angkaKeTerbilang(val) + " Rupiah";
+            } else {
+                displayTerbilangIdr.innerText = "Menunggu input...";
+            }
+
+            // Hitung Estimasi Kripto
+            if (currentPrice > 0 && val > 0) {
+                const totalKoin = val / currentPrice;
+                calcResult.innerText = totalKoin.toLocaleString('id-ID', { maximumFractionDigits: 6 });
+                displayTerbilangCrypto.innerText = terbilangKripto(totalKoin.toFixed(6), coin.toUpperCase());
+            } else {
+                calcResult.innerText = "0";
+                displayTerbilangCrypto.innerText = "Nol koin";
+            }
+        }
+
+        inputIdr.addEventListener('input', calculateConversion);
+        selectCoin.addEventListener('change', calculateConversion);
+
+        // Jalankan fetch pertama kali dan set interval 30 detik
+        fetchPrices();
+        setInterval(fetchPrices, 30000);
+
+    </script>
+</body>
+</html>
+
